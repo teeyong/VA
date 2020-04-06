@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1586159253322.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "C9244B29",
+    "lastKnownWriteTime" : 1586112906,
+    "last_content_update" : 1586112906,
+    "path" : "~/SMU/Y2S2/IS428-Visual Analytics for Business Intelligence/In class exercise/project/project/data/vgsales.csv",
+    "project_path" : "project/data/vgsales.csv",
+    "properties" : {
+        "cursorPosition" : "0,0",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "text"
+}
