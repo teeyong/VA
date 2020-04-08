@@ -40,7 +40,7 @@ if (interactive()) {
                        ),
             ),
             tabItem("overview",
-                    mainPanel(plotOutput("timeseries"))
+                    mainPanel(plotlyOutput("timeseries"))
                     
             ),
             tabItem("subitem1",
@@ -98,11 +98,45 @@ server <- function(input, output){
         }
     })
     
-    output$timeseries<- renderPlot({
-        xmin<-min(vg$Year)
-        xmax<-max(vg$Year)
-        ggplot(data=vg,aes(x=Year,y=Global_Sales))+
-            geom_line()+scale_x_date(breaks='5 years')
+    output$timeseries<- renderPlotly({
+        minYear=99999
+        maxYear=0
+        platform<-c()
+        for (r in 1:length(vg$Year)) {
+            if (vg$Year[r]!="N/A"){
+                if (vg$Year[r]<minYear){
+                    minYear=vg$Year[r]
+                }
+                if (vg$Year[r]>maxYear){
+                    maxYear=vg$Year[r]
+                }
+                platform<-append(platform,vg$platform)
+            }
+        }
+        YearRange <- c(minYear:maxYear)
+        #distinctx=unique(platform)
+        print(platform)
+        Sales=c()
+        #for (r in 1:length(vg$Year)) {
+         #   if (vg$Year[r]!="N/A"){
+          #      if (exists(vg$Platform, where = Sales)){
+                    #Sales[vg$Platform][vg$Year[r]]<-vg$Global_Sales
+           #     }else{
+            #        for (r in minYear:maxYear){
+                        #Sales[vg$Platform][vg$Year[r]]<-"0"
+                    #}
+                    # Sales[vg$Platform][vg$Year[r]]<-vg$Global_Sales
+          #      }
+         #   }
+        # }
+        #print(Sales)
+        #data <- data.frame(YearRange, Sales)
+        
+        #p <- plot_ly(data, x = ~YearRange, y = ~Sales, name = 'Global_Sales', type = 'scatter', mode = 'lines',
+               #      line = list(color = 'rgb(205, 12, 24)', width = 4))
+        # style the xaxis
+        #layout(p, xaxis = list(title = "Ratings", range = c(minx, maxx), autorange = F,
+                               #autotick = F, tick0 = minx, dtick = 2))
     })
 }
 
