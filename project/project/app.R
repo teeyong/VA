@@ -1,4 +1,4 @@
-packages = c('tidyverse','shiny','shinydashboard','plotly','ggplot2','ggrepel')
+packages = c('tidyverse','shiny','shinydashboard','plotly','ggplot2','ggrepel','treemap','tmap','sf')
 for (p in packages){
     if (!require(p, character.only= T)){
         install.packages(p)
@@ -20,6 +20,14 @@ if (interactive()) {
             id = "tabs",
             menuItem("About Us", tabName = "aboutus", icon = icon("info")),
             menuItem("Overview", tabName = "overview", icon = icon("dashboard")),
+            menuItem("Details", icon = icon("dashboard"),
+                     menuSubItem("Sub-item 1", tabName = "heatmap1",  icon = icon("dashboard")),
+                     menuSubItem("Sub-item 2", tabName = "heatmap2",  icon = icon("dashboard"))
+            ),
+            menuItem("Details", icon = icon("dashboard"),
+                     menuSubItem("Sub-item 1", tabName = "Graph",  icon = icon("dashboard")),
+                     menuSubItem("Sub-item 2", tabName = "Graph2",  icon = icon("dashboard"))
+            ),
             menuItem("Details", icon = icon("dashboard"),
                      menuSubItem("Sub-item 1", tabName = "subitem1",  icon = icon("dashboard")),
                      menuSubItem("Sub-item 2", tabName = "subitem2",  icon = icon("dashboard"))
@@ -53,6 +61,35 @@ if (interactive()) {
                         mainPanel(plotlyOutput("timeseries"))
                     )
                     
+            ),
+            tabItem("heatmap1",
+                    mainPanel(
+                        fluidRow(
+                            column(4,plotOutput("heatmapNA", width=500,height=350)),
+                            column(4,offset = 4,plotOutput("heatmapEU", width=500,height=350))
+                        ),
+                        fluidRow(
+                            column(4,plotOutput("heatmapJP", width=500,height=350)),
+                            column(4,offset = 4,plotOutput("heatmapOther", width=500,height=350))
+                        )
+                    )
+
+                    
+            ),
+            tabItem("heatmap2",
+                    mainPanel(
+                        plotOutput("heatmapGlobal", width=800,height=600)
+                    )
+            ),
+            tabItem("Graph",
+                    mainPanel(
+                        plotOutput("map1")
+                    )
+            ),
+            tabItem("Graph2",
+                    mainPanel(
+                        plotOutput("map2", width=800,height=600)
+                    )
             ),
             tabItem("subitem1",
                     "Sub-item 1 tab content",
@@ -90,29 +127,8 @@ if (interactive()) {
 ui <- dashboardPage(skin = "black",header, sidebar, body)
 
 server <- function(input, output){
-    output$paretoChart <-renderPlot({
-        dat <-vg[order(vg$Global_Sales,decreasing = TRUE),]
-        myDf <-data.frame(sales = dat$Global_Sales,publisher= dat$Publisher, stringsAsFactors = FALSE)
-        
-        myDf<- myDf %>% as_tibble() %>% mutate(
-            cumulative = cumsum(sales),
-            freq = round(sales / sum(sales),3)*100,
-            cum_freq = cumsum(freq)
-        )
-        myDf[dim(myDf)[1],dim(myDf)[2]] <- 100 #force last level
-        
-        pareto <- ggplot(myDf, aes(x=reorder(publisher,-sales),y=sales)) +
-            geom_bar(aes(y=myDf$sales), fill='blue', stat="identity") +
-            geom_point(aes(y=myDf$cumulative), color = rgb(0, 1, 0), pch=16, size=3) +
-            geom_path(aes(y=myDf$cumulative, group=1)) +
-            theme(axis.text.x = element_text(size = 12,angle=90, vjust=0.6)) +
-            labs(title = "publisher Pareto Plot", 
-                 subtitle = "Produced by David Arteta", 
-                 x = 'Publishers', y = 'Cumulative Sales')
-        
-        pareto 
-    })
-    
+
+    #timeseries
     output$timeseries<- renderPlotly({
         minYear=99999
         maxYear=0
@@ -388,44 +404,168 @@ server <- function(input, output){
         }
         data <- data.frame(YearRange, v2600,v3DO,v3DS, DC,DS, GB, GBA,GC, Gen,GG, N64,NES,NG, PC, PCFX, PS, PS2, PS3, PS4,PSP,PSV,SAT,SCD,SNES, TG16, Wii,WiiU, WS, X360, XB,  XOne)
                
-        p <- plot_ly(data, x = ~YearRange, y = ~v2600, name = 'v2600', type = 'scatter', mode = 'lines+markers',
+        p <- plot_ly(data, x = ~YearRange, y = ~v2600, name = '2600', type = 'scatter', mode = 'lines+markers',
                      line = list(color = 'rgb(205, 12, 24)', width = 4), hovertemplate = paste('<i>2600</b>',
                                                                                                '<br><i>%{x}</i><br>',
-                                                                                               '<i>Total Sales: $%{y:.2f}</i>'))
-        p <- p %>% add_trace(y = ~v3DO, name = 'v3DO', mode = 'lines+markers' ) 
-        p <- p %>% add_trace(y = ~v3DS, name = 'v3DS', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~DC, name = 'DC', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~DS, name = 'DS', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~GB, name = 'GB', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~GBA, name = 'GBA', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~GC, name = 'GC', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~Gen, name = 'Gen', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~GG, name = 'GG', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~N64, name = 'N64', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~NES, name = 'NES', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~NG, name = 'NG', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~PC, name = 'PC', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~PCFX, name = 'PCFX', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~PS, name = 'PS', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~PS2, name = 'PS2', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~PS3, name = 'PS3', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~PS4, name = 'PS4', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~PSP, name = 'PSP', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~PSV, name = 'PSV', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~SAT, name = 'SAT', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~SCD, name = 'SCD', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~SNES, name = 'SNES', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~TG16, name = 'TG16', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~Wii, name = 'Wii', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~WiiU, name = 'WiiU', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~WS, name = 'WS', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~X360, name = 'X360', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~XB, name = 'XB', mode = 'lines+markers') 
-        p <- p %>% add_trace(y = ~XOne, name = 'XOne', mode = 'lines+markers') 
+                                                                                               '<i>Total Sales: $%{y:.2f} million</i>'))
+        p <- p %>% add_trace(y = ~v3DO, name = '3DO', mode = 'lines+markers' ,hovertemplate = paste('<i>3DO</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>')) 
+        p <- p %>% add_trace(y = ~v3DS, name = '3DS', mode = 'lines+markers',hovertemplate = paste('<i>3DS</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~DC, name = 'DC', mode = 'lines+markers',hovertemplate = paste('<i>DC</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~DS, name = 'DS', mode = 'lines+markers',hovertemplate = paste('<i>DS</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~GB, name = 'GB', mode = 'lines+markers',hovertemplate = paste('<i>GB</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~GBA, name = 'GBA', mode = 'lines+markers',hovertemplate = paste('<i>GBA</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~GC, name = 'GC', mode = 'lines+markers',hovertemplate = paste('<i>GC</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~Gen, name = 'Gen', mode = 'lines+markers',hovertemplate = paste('<i>Gen</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~GG, name = 'GG', mode = 'lines+markers',hovertemplate = paste('<i>GG</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~N64, name = 'N64', mode = 'lines+markers',hovertemplate = paste('<i>N64</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million million</i>'))  
+        p <- p %>% add_trace(y = ~NES, name = 'NES', mode = 'lines+markers',hovertemplate = paste('<i>NES</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~NG, name = 'NG', mode = 'lines+markers',hovertemplate = paste('<i>NG</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~PC, name = 'PC', mode = 'lines+markers',hovertemplate = paste('<i>PC</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~PCFX, name = 'PCFX', mode = 'lines+markers',hovertemplate = paste('<i>PCFX</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~PS, name = 'PS', mode = 'lines+markers',hovertemplate = paste('<i>PS</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~PS2, name = 'PS2', mode = 'lines+markers',hovertemplate = paste('<i>PS2</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~PS3, name = 'PS3', mode = 'lines+markers',hovertemplate = paste('<i>PS3</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~PS4, name = 'PS4', mode = 'lines+markers',hovertemplate = paste('<i>PS4</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~PSP, name = 'PSP', mode = 'lines+markers',hovertemplate = paste('<i>PSP</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~PSV, name = 'PSV', mode = 'lines+markers',hovertemplate = paste('<i>PSV</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~SAT, name = 'SAT', mode = 'lines+markers',hovertemplate = paste('<i>SAT</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~SCD, name = 'SCD', mode = 'lines+markers',hovertemplate = paste('<i>SCD</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~SNES, name = 'SNES', mode = 'lines+markers',hovertemplate = paste('<i>SNES</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~TG16, name = 'TG16', mode = 'lines+markers',hovertemplate = paste('<i>TG16</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~Wii, name = 'Wii', mode = 'lines+markers',hovertemplate = paste('<i>Wii</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~WiiU, name = 'WiiU', mode = 'lines+markers',hovertemplate = paste('<i>WiiU</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~WS, name = 'WS', mode = 'lines+markers',hovertemplate = paste('<i>WS</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~X360, name = 'X360', mode = 'lines+markers',hovertemplate = paste('<i>X360</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~XB, name = 'XB', mode = 'lines+markers',hovertemplate = paste('<i>XB</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
+        p <- p %>% add_trace(y = ~XOne, name = 'XOne', mode = 'lines+markers',hovertemplate = paste('<i>XOne</b>','<br><i>%{x}</i><br>','<i>Total Sales: $%{y:.2f} million</i>'))  
         
         # style the xaxis
         layout(p, xaxis = list(title = "Time", range = c(input$slider1[1], input$slider1[2]), autorange = F,
-                               autotick = F, tick0 = minYear, dtick = 5), yaxis=list(title = "Sales"),title = "Sale over the years")
+                               autotick = F, tick0 = minYear, dtick = 5), yaxis=list(title = "Sales in million"),title = "Sale over the years")
+    })
+    
+    #heatmap
+    output$heatmapNA <-renderPlot({
+        vg_grouped <- group_by(vg, `Genre`)
+        vg_summarised <- summarise(vg_grouped, 
+                                            `Total NA_Sales` = sum(`NA_Sales`, na.rm = TRUE),
+                                            `Total EU_Sales` = sum(`EU_Sales`, na.rm = TRUE),
+                                            `Total JP_Sales` = sum(`JP_Sales`, na.rm = TRUE), 
+                                            `Total Other_Sales` = sum(`Other_Sales`, na.rm = TRUE),
+                                            `Total Global_Sales` = sum(`Global_Sales`, na.rm = TRUE))
+        treemap(vg_summarised,
+                index=c("Genre"),
+                vSize="Total NA_Sales",
+                vColor="Total NA_Sales",
+                type = "value",
+                title="Treemap for NA",
+                title.legend = "Total NA_Sales in million"
+        )
+    })
+    
+    output$heatmapEU <-renderPlot({
+        vg_grouped <- group_by(vg, `Genre`)
+        vg_summarised <- summarise(vg_grouped, 
+                                   `Total NA_Sales` = sum(`NA_Sales`, na.rm = TRUE),
+                                   `Total EU_Sales` = sum(`EU_Sales`, na.rm = TRUE),
+                                   `Total JP_Sales` = sum(`JP_Sales`, na.rm = TRUE), 
+                                   `Total Other_Sales` = sum(`Other_Sales`, na.rm = TRUE),
+                                   `Total Global_Sales` = sum(`Global_Sales`, na.rm = TRUE))
+        treemap(vg_summarised,
+                index=c("Genre"),
+                vSize="Total EU_Sales",
+                vColor="Total EU_Sales",
+                type = "value",
+                title="Treemap for EU",
+                title.legend = "Total EU_Sales in million"
+        )
+    })
+    
+    output$heatmapJP <-renderPlot({
+        vg_grouped <- group_by(vg, `Genre`)
+        vg_summarised <- summarise(vg_grouped, 
+                                   `Total NA_Sales` = sum(`NA_Sales`, na.rm = TRUE),
+                                   `Total EU_Sales` = sum(`EU_Sales`, na.rm = TRUE),
+                                   `Total JP_Sales` = sum(`JP_Sales`, na.rm = TRUE), 
+                                   `Total Other_Sales` = sum(`Other_Sales`, na.rm = TRUE),
+                                   `Total Global_Sales` = sum(`Global_Sales`, na.rm = TRUE))
+        treemap(vg_summarised,
+                index=c("Genre"),
+                vSize="Total JP_Sales",
+                vColor="Total JP_Sales",
+                type = "value",
+                title="Treemap for JP",
+                title.legend = "Total JP_Sales in million"
+        )
+    })
+    
+    output$heatmapOther <-renderPlot({
+        vg_grouped <- group_by(vg, `Genre`)
+        vg_summarised <- summarise(vg_grouped, 
+                                   `Total NA_Sales` = sum(`NA_Sales`, na.rm = TRUE),
+                                   `Total EU_Sales` = sum(`EU_Sales`, na.rm = TRUE),
+                                   `Total JP_Sales` = sum(`JP_Sales`, na.rm = TRUE), 
+                                   `Total Other_Sales` = sum(`Other_Sales`, na.rm = TRUE),
+                                   `Total Global_Sales` = sum(`Global_Sales`, na.rm = TRUE))
+        treemap(vg_summarised,
+                index=c("Genre"),
+                vSize="Total Other_Sales",
+                vColor="Total Other_Sales",
+                type = "value",
+                title="Treemap for Other",
+                title.legend = "Total Other_Sales in million"
+        )
+    })
+    
+    output$heatmapGlobal <-renderPlot({
+        vg_grouped <- group_by(vg, `Genre`)
+        vg_summarised <- summarise(vg_grouped, 
+                                   `Total NA_Sales` = sum(`NA_Sales`, na.rm = TRUE),
+                                   `Total EU_Sales` = sum(`EU_Sales`, na.rm = TRUE),
+                                   `Total JP_Sales` = sum(`JP_Sales`, na.rm = TRUE), 
+                                   `Total Other_Sales` = sum(`Other_Sales`, na.rm = TRUE),
+                                   `Total Global_Sales` = sum(`Global_Sales`, na.rm = TRUE))
+        treemap(vg_summarised,
+                index=c("Genre"),
+                vSize="Total Global_Sales",
+                vColor="Total Global_Sales",
+                type = "value",
+                title="Treemap for Global Sales",
+                title.legend = "Total Global_Sales in million"
+        )
+    })
+    
+    #map
+    output$map1 <-renderPlot({
+        data("World")
+        
+        tm_shape(World) +
+            tm_polygons()
+        
+    })
+    
+    #pareto Chart
+    output$paretoChart <-renderPlot({
+        dat <-vg[order(vg$Global_Sales,decreasing = TRUE),]
+        myDf <-data.frame(sales = dat$Global_Sales,publisher= dat$Publisher, stringsAsFactors = FALSE)
+        
+        myDf<- myDf %>% as_tibble() %>% mutate(
+            cumulative = cumsum(sales),
+            freq = round(sales / sum(sales),3)*100,
+            cum_freq = cumsum(freq)
+        )
+        myDf[dim(myDf)[1],dim(myDf)[2]] <- 100 #force last level
+        
+        pareto <- ggplot(myDf, aes(x=reorder(publisher,-sales),y=sales)) +
+            geom_bar(aes(y=myDf$sales), fill='blue', stat="identity") +
+            geom_point(aes(y=myDf$cumulative), color = rgb(0, 1, 0), pch=16, size=3) +
+            geom_path(aes(y=myDf$cumulative, group=1)) +
+            theme(axis.text.x = element_text(size = 12,angle=90, vjust=0.6)) +
+            labs(title = "publisher Pareto Plot", 
+                 subtitle = "Produced by David Arteta", 
+                 x = 'Publishers', y = 'Cumulative Sales')
+        
+        pareto 
     })
     
     the_data_fn <- reactive({
