@@ -1,4 +1,4 @@
-packages = c('tidyverse','shiny','shinydashboard','plotly','ggplot2','ggrepel','treemap','tmap','sf')
+packages = c('tidyverse','shiny','shinydashboard','plotly','ggplot2','ggrepel','treemap')
 for (p in packages){
     if (!require(p, character.only= T)){
         install.packages(p)
@@ -83,7 +83,7 @@ if (interactive()) {
             ),
             tabItem("Graph",
                     mainPanel(
-                        plotOutput("map1")
+                        plotlyOutput("map1", width=1000,height=600)
                     )
             ),
             tabItem("Graph2",
@@ -536,11 +536,20 @@ server <- function(input, output){
     })
     
     #map
-    output$map1 <-renderPlot({
-        data("World")
-        
-        tm_shape(World) +
-            tm_polygons()
+    output$map1 <-renderPlotly({
+        vg_grouped <- group_by(vg, `Publisher`)
+        vg_summarised <- summarise(vg_grouped, 
+                                   `Total NA_Sales` = sum(`NA_Sales`, na.rm = TRUE),
+                                   `Total EU_Sales` = sum(`EU_Sales`, na.rm = TRUE),
+                                   `Total JP_Sales` = sum(`JP_Sales`, na.rm = TRUE), 
+                                   `Total Other_Sales` = sum(`Other_Sales`, na.rm = TRUE),
+                                   `Total Global_Sales` = sum(`Global_Sales`, na.rm = TRUE))
+        vg_summarised <-vg_summarised[order(vg_summarised$`Total Global_Sales`,decreasing = TRUE),]
+        print(vg_summarised)
+        p <- plot_ly(vg_summarised, x = ~`Publisher`, y = ~`Total NA_Sales`, name = 'Total NA_Sales', type = 'bar')
+        p <- p %>% add_trace(y = ~`Total EU_Sales`, name = 'Total EU_Sales')
+        p <- p %>% add_trace(y = ~`Total JP_Sales`, name = 'Total JP_Sales')
+        p <- p %>% add_trace(y = ~`Total Other_Sales`, name = 'Total Other_Sales')
         
     })
     
