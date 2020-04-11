@@ -1,10 +1,18 @@
-packages = c('tidyverse','shiny','shinydashboard','plotly','ggplot2','ggrepel','treemap')
-for (p in packages){
-    #if (!require(p, character.only= T)){
-        #install.packages(p)
+#packages = c('tidyverse','shiny','shinydashboard','plotly','ggplot2','ggrepel','treemap')
+#for (p in packages){
+   # if (!require(p, character.only= T)){
+  #      install.packages(p)
     #}
-    library(p,character.only= T)
-}
+ #   library(p,character.only= T)
+#}
+
+library(shiny)
+library(shinydashboard, warn.conflicts=FALSE)
+library(tidyverse, warn.conflicts=FALSE)
+library(plotly, warn.conflicts=FALSE)
+library(ggplot2, warn.conflicts=FALSE)
+library(ggrepel, warn.conflicts=FALSE)
+library(treemap, warn.conflicts=FALSE)
 
 
 vg<-read_csv("data/vgsales.csv")
