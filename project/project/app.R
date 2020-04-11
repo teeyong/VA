@@ -1,15 +1,14 @@
 packages = c('tidyverse','shiny','shinydashboard','plotly','ggplot2','ggrepel','treemap')
 for (p in packages){
-    if (!require(p, character.only= T)){
-        install.packages(p)
-    }
+    #if (!require(p, character.only= T)){
+        #install.packages(p)
+    #}
     library(p,character.only= T)
 }
 
 
-exam <- read_csv("data/Exam_data.csv")
 vg<-read_csv("data/vgsales.csv")
-datacsv<-read_csv("data/Failure_pareto.csv")
+
 #interface with interactivity
 if (interactive()) {
     header <- dashboardHeader(title=img(src = "nogamenolife.png",height='40',width='100'))
@@ -24,14 +23,7 @@ if (interactive()) {
                      menuSubItem("Sub-item 1", tabName = "heatmap1",  icon = icon("dashboard")),
                      menuSubItem("Sub-item 2", tabName = "heatmap2",  icon = icon("dashboard"))
             ),
-            menuItem("Details", icon = icon("dashboard"),
-                     menuSubItem("Sub-item 1", tabName = "Graph",  icon = icon("dashboard")),
-                     menuSubItem("Sub-item 2", tabName = "Graph2",  icon = icon("dashboard"))
-            ),
-            menuItem("Details", icon = icon("dashboard"),
-                     menuSubItem("Sub-item 1", tabName = "subitem1",  icon = icon("dashboard")),
-                     menuSubItem("Sub-item 2", tabName = "subitem2",  icon = icon("dashboard"))
-            )
+            menuItem("Publisher", tabName = "Graph", icon = icon("dashboard"))
         ),collapsed = FALSE
     )
     
@@ -82,41 +74,600 @@ if (interactive()) {
                     )
             ),
             tabItem("Graph",
-                    mainPanel(
-                        plotlyOutput("map1", width=1000,height=600)
-                    )
-            ),
-            tabItem("Graph2",
-                    mainPanel(
-                        plotOutput("map2", width=800,height=600)
-                    )
-            ),
-            tabItem("subitem1",
-                    "Sub-item 1 tab content",
                     sidebarLayout(
                         sidebarPanel(
+                            selectInput(inputId="variable",
+                                        label="Publisher:",
+                                        choices=c("All",
+                                                  "10TACLE Studios",
+                                                  "1C Company",
+                                                  "20th Century Fox Video Games",
+                                                  "2D Boy",
+                                                  "3DO",
+                                                  "49Games",
+                                                  "505 Games",
+                                                  "5pb",
+                                                  "7G//AMES",
+                                                  "989 Sports",
+                                                  "989 Studios",
+                                                  "Abylight",
+                                                  "Acclaim Entertainment",
+                                                  "Accolade",
+                                                  "Ackkstudios",
+                                                  "Acquire",
+                                                  "Activision",
+                                                  "Activision Blizzard",
+                                                  "Activision Value",
+                                                  "Adeline Software",
+                                                  "Aerosoft",
+                                                  "Agatsuma Entertainment",
+                                                  "Agetec",
+                                                  "Aksys Games",
+                                                  "Alawar Entertainment",
+                                                  "Alchemist",
+                                                  "Alternative Software",
+                                                  "Altron",
+                                                  "Alvion",
+                                                  "American Softworks",
+                                                  "Angel Studios",
+                                                  "Answer Software",
+                                                  "AQ Interactive",
+                                                  "Aqua Plus",
+                                                  "Aques",
+                                                  "Arc System Works",
+                                                  "Arena Entertainment",
+                                                  "Aria",
+                                                  "Arika",
+                                                  "ArtDink",
+                                                  "Aruze Corp",
+                                                  "ASC Games",
+                                                  "Ascaron Entertainment",
+                                                  "Ascaron Entertainment GmbH",
+                                                  "ASCII Entertainment",
+                                                  "ASCII Media Works",
+                                                  "Asgard",
+                                                  "ASK",
+                                                  "Asmik Ace Entertainment",
+                                                  "Asmik Corp",
+                                                  "Aspyr",
+                                                  "Astragon",
+                                                  "Asylum Entertainment",
+                                                  "Atari",
+                                                  "Athena",
+                                                  "Atlus",
+                                                  "Avalon Interactive",
+                                                  "Avanquest",
+                                                  "Avanquest Software",
+                                                  "Axela",
+                                                  "BAM! Entertainment",
+                                                  "Banpresto",
+                                                  "Benesse",
+                                                  "Berkeley",
+                                                  "Bethesda Softworks",
+                                                  "Big Ben Interactive",
+                                                  "Big Fish Games",
+                                                  "Bigben Interactive",
+                                                  "bitComposer Games",
+                                                  "Black Bean Games",
+                                                  "Black Label Games",
+                                                  "Blast! Entertainment Ltd",
+                                                  "Blue Byte",
+                                                  "BMG Interactive Entertainment",
+                                                  "Bohemia Interactive",
+                                                  "Bomb",
+                                                  "Boost On",
+                                                  "BPS",
+                                                  "Brash Entertainment",
+                                                  "Broccoli",
+                                                  "BushiRoad",
+                                                  "Capcom",
+                                                  "Cave",
+                                                  "CBS Electronics",
+                                                  "CCP",
+                                                  "CDV Software Entertainment",
+                                                  "ChunSoft",
+                                                  "City Interactive",
+                                                  "Cloud Imperium Games Corporation",
+                                                  "Coconuts Japan",
+                                                  "Codemasters",
+                                                  "Codemasters Online",
+                                                  "CokeM Interactive",
+                                                  "Coleco",
+                                                  "Comfort",
+                                                  "Commseed",
+                                                  "Compile",
+                                                  "Compile Heart",
+                                                  "Conspiracy Entertainment",
+                                                  "Core Design Ltd.",
+                                                  "CPG Products",
+                                                  "Crave Entertainment",
+                                                  "Creative Core",
+                                                  "Crimson Cow",
+                                                  "Crystal Dynamics",
+                                                  "CTO SpA",
+                                                  "Culture Brain",
+                                                  "Culture Publishers",
+                                                  "CyberFront",
+                                                  "Cygames",
+                                                  "D3Publisher",
+                                                  "Daedalic",
+                                                  "Daedalic Entertainment",
+                                                  "Daito",
+                                                  "Data Age",
+                                                  "Data Design Interactive",
+                                                  "Data East",
+                                                  "Datam Polystar",
+                                                  "Deep Silver",
+                                                  "Destination Software, Inc",
+                                                  "Destineer",
+                                                  "Detn8 Games",
+                                                  "Devolver Digital",
+                                                  "DHM Interactive",
+                                                  "DigiCube",
+                                                  "Disney Interactive Studios",
+                                                  "Dorart",
+                                                  "dramatic create",
+                                                  "DreamCatcher Interactive",
+                                                  "DreamWorks Interactive",
+                                                  "DSI Games",
+                                                  "DTP Entertainment",
+                                                  "Dusenberry Martin Racing",
+                                                  "EA Games",
+                                                  "Easy Interactive",
+                                                  "Ecole",
+                                                  "Edia",
+                                                  "Eidos Interactive",
+                                                  "Electronic Arts",
+                                                  "Electronic Arts Victor",
+                                                  "Elf",
+                                                  "Elite",
+                                                  "Empire Interactive",
+                                                  "Encore",
+                                                  "Enix Corporation",
+                                                  "Enjoy Gaming ltd.",
+                                                  "Enterbrain",
+                                                  "EON Digital Entertainment",
+                                                  "Epic Games",
+                                                  "Epoch",
+                                                  "Ertain",
+                                                  "ESP",
+                                                  "Essential Games",
+                                                  "Evolution Games",
+                                                  "Evolved Games",
+                                                  "Excalibur Publishing",
+                                                  "Experience Inc.",
+                                                  "Extreme Entertainment Group",
+                                                  "Falcom Corporation",
+                                                  "Fields",
+                                                  "Flashpoint Games",
+                                                  "Flight-Plan",
+                                                  "Focus Home Interactive",
+                                                  "Focus Multimedia",
+                                                  "fonfun",
+                                                  "Foreign Media Games",
+                                                  "Fortyfive",
+                                                  "Fox Interactive",
+                                                  "From Software",
+                                                  "Fuji",
+                                                  "Funbox Media",
+                                                  "Funcom",
+                                                  "FunSoft",
+                                                  "Funsta",
+                                                  "FuRyu",
+                                                  "FuRyu Corporation",
+                                                  "G.Rev",
+                                                  "Gaga",
+                                                  "Gainax Network Systems",
+                                                  "Gakken",
+                                                  "Game Arts",
+                                                  "Game Factory",
+                                                  "Game Life",
+                                                  "Gamebridge",
+                                                  "Gamecock",
+                                                  "Gameloft",
+                                                  "GameMill Entertainment",
+                                                  "GameTek",
+                                                  "Gathering of Developers",
+                                                  "General Entertainment",
+                                                  "Genki",
+                                                  "Genterprise",
+                                                  "Ghostlight",
+                                                  "Giga",
+                                                  "Giza10",
+                                                  "Glams",
+                                                  "Global A Entertainment",
+                                                  "Global Star",
+                                                  "GN Software",
+                                                  "GOA",
+                                                  "Gotham Games",
+                                                  "Graffiti",
+                                                  "Grand Prix Games",
+                                                  "Graphsim Entertainment",
+                                                  "Gremlin Interactive Ltd",
+                                                  "Griffin International",
+                                                  "Groove Games",
+                                                  "GSP",
+                                                  "GT Interactive",
+                                                  "GungHo",
+                                                  "Gust",
+                                                  "Hackberry",
+                                                  "HAL Laboratory",
+                                                  "Hamster Corporation",
+                                                  "Happinet",
+                                                  "Harmonix Music Systems",
+                                                  "Hasbro Interactive",
+                                                  "Havas Interactive",
+                                                  "Headup Games",
+                                                  "Hearty Robin",
+                                                  "Hect",
+                                                  "Hello Games",
+                                                  "Her Interactive",
+                                                  "Hip Interactive",
+                                                  "HMH Interactive",
+                                                  "Home Entertainment Suppliers",
+                                                  "Hudson Entertainment",
+                                                  "Hudson Soft",
+                                                  "Human Entertainment",
+                                                  "HuneX",
+                                                  "Iceberg Interactive",
+                                                  "id Software",
+                                                  "Idea Factory",
+                                                  "Idea Factory International",
+                                                  "IE Institute",
+                                                  "Ignition Entertainment",
+                                                  "Illusion Softworks",
+                                                  "Imadio",
+                                                  "Image Epoch",
+                                                  "imageepoch Inc.",
+                                                  "Imageworks",
+                                                  "Imagic",
+                                                  "Imagineer",
+                                                  "Imax",
+                                                  "Indie Games",
+                                                  "Infogrames",
+                                                  "Insomniac Games",
+                                                  "Interchannel",
+                                                  "Interchannel-Holon",
+                                                  "Intergrow",
+                                                  "Interplay",
+                                                  "Interplay Productions",
+                                                  "Interworks Unlimited, Inc.",
+                                                  "Inti Creates",
+                                                  "Introversion Software",
+                                                  "inXile Entertainment",
+                                                  "Irem Software Engineering",
+                                                  "ITT Family Games",
+                                                  "Ivolgamus",
+                                                  "iWin",
+                                                  "Jack of All Games",
+                                                  "Jaleco",
+                                                  "Jester Interactive",
+                                                  "Jorudan",
+                                                  "JoWood Productions",
+                                                  "Just Flight",
+                                                  "JVC",
+                                                  "Kadokawa Games",
+                                                  "Kadokawa Shoten",
+                                                  "Kaga Create",
+                                                  "Kalypso Media",
+                                                  "Kamui",
+                                                  "Kando Games",
+                                                  "Karin Entertainment",
+                                                  "Kemco",
+                                                  "KID",
+                                                  "Kids Station",
+                                                  "King Records",
+                                                  "Knowledge Adventure",
+                                                  "Koch Media",
+                                                  "Kokopeli Digital Studios",
+                                                  "Konami Digital Entertainment",
+                                                  "Kool Kizz",
+                                                  "KSS",
+                                                  "Laguna",
+                                                  "Legacy Interactive",
+                                                  "LEGO Media",
+                                                  "Level 5",
+                                                  "Lexicon Entertainment",
+                                                  "Licensed 4U",
+                                                  "Lighthouse Interactive",
+                                                  "Liquid Games",
+                                                  "Little Orbit",
+                                                  "Locus",
+                                                  "LSP Games",
+                                                  "LucasArts",
+                                                  "Mad Catz",
+                                                  "Magical Company",
+                                                  "Magix",
+                                                  "Majesco Entertainment",
+                                                  "Mamba Games",
+                                                  "Marvel Entertainment",
+                                                  "Marvelous Entertainment",
+                                                  "Marvelous Games",
+                                                  "Marvelous Interactive",
+                                                  "Masque Publishing",
+                                                  "Mastertronic",
+                                                  "Mastiff",
+                                                  "Mattel Interactive",
+                                                  "Max Five",
+                                                  "Maximum Family Games",
+                                                  "Maxis",
+                                                  "MC2 Entertainment",
+                                                  "Media Entertainment",
+                                                  "Media Factory",
+                                                  "Media Rings",
+                                                  "Media Works",
+                                                  "MediaQuest",
+                                                  "Men-A-Vision",
+                                                  "Mentor Interactive",
+                                                  "Mercury Games",
+                                                  "Merscom LLC",
+                                                  "Metro 3D",
+                                                  "Michaelsoft",
+                                                  "Micro Cabin",
+                                                  "Microids",
+                                                  "Microprose",
+                                                  "Microsoft Game Studios",
+                                                  "Midas Interactive Entertainment",
+                                                  "Midway Games",
+                                                  "Milestone",
+                                                  "Milestone S.r.l",
+                                                  "Milestone S.r.l.",
+                                                  "Minato Station",
+                                                  "Mindscape",
+                                                  "Mirai Shounen",
+                                                  "Misawa",
+                                                  "Mitsui",
+                                                  "mixi, Inc",
+                                                  "MLB.com",
+                                                  "Mojang",
+                                                  "Monte Christo Multimedia",
+                                                  "Moss",
+                                                  "MTO",
+                                                  "MTV Games",
+                                                  "Mud Duck Productions",
+                                                  "Mumbo Jumbo",
+                                                  "Mycom",
+                                                  "Myelin Media",
+                                                  "Mystique",
+                                                  "N/A",
+                                                  "Namco Bandai Games",
+                                                  "Natsume",
+                                                  "Navarre Corp",
+                                                  "Naxat Soft",
+                                                  "NCS",
+                                                  "NCSoft",
+                                                  "NDA Productions",
+                                                  "NEC",
+                                                  "NEC Interchannel",
+                                                  "Neko Entertainment",
+                                                  "NetRevo",
+                                                  "New",
+                                                  "New World Computing",
+                                                  "NewKidCo",
+                                                  "Nexon",
+                                                  "Nichibutsu",
+                                                  "Nihon Falcom Corporation",
+                                                  "Nintendo",
+                                                  "Nippon Amuse",
+                                                  "Nippon Columbia",
+                                                  "Nippon Ichi Software",
+                                                  "Nippon Telenet",
+                                                  "Nitroplus",
+                                                  "Nobilis",
+                                                  "Nordcurrent",
+                                                  "Nordic Games",
+                                                  "NovaLogic",
+                                                  "Number None",
+                                                  "O3 Entertainment",
+                                                  "Ocean",
+                                                  "Office Create",
+                                                  "O-Games",
+                                                  "On Demand",
+                                                  "Ongakukan",
+                                                  "Origin Systems",
+                                                  "Otomate",
+                                                  "Oxygen Interactive",
+                                                  "P2 Games",
+                                                  "Pacific Century Cyber Works",
+                                                  "Pack In Soft",
+                                                  "Pack-In-Video",
+                                                  "Palcom",
+                                                  "Panther Software",
+                                                  "Paon",
+                                                  "Paon Corporation",
+                                                  "Paradox Development",
+                                                  "Paradox Interactive",
+                                                  "Parker Bros.",
+                                                  "Performance Designed Products",
+                                                  "Phantagram",
+                                                  "Phantom EFX",
+                                                  "Phenomedia",
+                                                  "Phoenix Games",
+                                                  "Piacci",
+                                                  "Pinnacle",
+                                                  "Pioneer LDC",
+                                                  "Play It",
+                                                  "Playlogic Game Factory",
+                                                  "Playmates",
+                                                  "Playmore",
+                                                  "PlayV",
+                                                  "Plenty",
+                                                  "PM Studios",
+                                                  "Pony Canyon",
+                                                  "PopCap Games",
+                                                  "Popcorn Arcade",
+                                                  "PopTop Software",
+                                                  "Pow",
+                                                  "PQube",
+                                                  "Princess Soft",
+                                                  "Prototype",
+                                                  "Psygnosis",
+                                                  "Quelle",
+                                                  "Quest",
+                                                  "Quinrose",
+                                                  "Quintet",
+                                                  "Rage Software",
+                                                  "Rain Games",
+                                                  "Rebellion",
+                                                  "Rebellion Developments",
+                                                  "RED Entertainment",
+                                                  "Red Orb",
+                                                  "Red Storm Entertainment",
+                                                  "RedOctane",
+                                                  "Reef Entertainment",
+                                                  "responDESIGN",
+                                                  "Revolution (Japan)",
+                                                  "Revolution Software",
+                                                  "Rising Star Games",
+                                                  "Riverhillsoft",
+                                                  "Rocket Company",
+                                                  "Rondomedia",
+                                                  "RTL",
+                                                  "Russel",
+                                                  "Sammy Corporation",
+                                                  "Saurus",
+                                                  "Scholastic Inc.",
+                                                  "SCi",
+                                                  "Screenlife",
+                                                  "SCS Software",
+                                                  "Sears",
+                                                  "Sega",
+                                                  "Seta Corporation",
+                                                  "Seventh Chord",
+                                                  "Shogakukan",
+                                                  "Simon & Schuster Interactive",
+                                                  "Slightly Mad Studios",
+                                                  "Slitherine Software",
+                                                  "SNK",
+                                                  "SNK Playmore",
+                                                  "Societa",
+                                                  "Sold Out",
+                                                  "Sonnet",
+                                                  "Sony Computer Entertainment",
+                                                  "Sony Computer Entertainment America",
+                                                  "Sony Computer Entertainment Europe",
+                                                  "Sony Music Entertainment",
+                                                  "Sony Online Entertainment",
+                                                  "SouthPeak Games",
+                                                  "Spike",
+                                                  "SPS",
+                                                  "Square",
+                                                  "Square EA",
+                                                  "Square Enix",
+                                                  "SquareSoft",
+                                                  "SSI",
+                                                  "Stainless Games",
+                                                  "Starfish",
+                                                  "Starpath Corp.",
+                                                  "Sting",
+                                                  "Storm City Games",
+                                                  "Strategy First",
+                                                  "Success",
+                                                  "Summitsoft",
+                                                  "Sunflowers",
+                                                  "Sunrise Interactive",
+                                                  "Sunsoft",
+                                                  "Sweets",
+                                                  "Swing! Entertainment",
+                                                  "Syscom",
+                                                  "System 3",
+                                                  "System 3 Arcade Software",
+                                                  "System Soft",
+                                                  "T&E Soft",
+                                                  "Taito",
+                                                  "Takara",
+                                                  "Takara Tomy",
+                                                  "Take-Two Interactive",
+                                                  "Takuyo",
+                                                  "TalonSoft",
+                                                  "TDK Core",
+                                                  "TDK Mediactive",
+                                                  "Team17 Software",
+                                                  "Technos Japan Corporation",
+                                                  "TechnoSoft",
+                                                  "Tecmo Koei",
+                                                  "Telegames",
+                                                  "Telltale Games",
+                                                  "Telstar",
+                                                  "Tetris Online",
+                                                  "TGL",
+                                                  "The Adventure Company",
+                                                  "The Learning Company",
+                                                  "THQ",
+                                                  "Tigervision",
+                                                  "Time Warner Interactive",
+                                                  "Titus",
+                                                  "Tivola",
+                                                  "TOHO",
+                                                  "Tommo",
+                                                  "Tomy Corporation",
+                                                  "TopWare Interactive",
+                                                  "Touchstone",
+                                                  "Tradewest",
+                                                  "Trion Worlds",
+                                                  "Tripwire Interactive",
+                                                  "Tru Blu Entertainment",
+                                                  "Tryfirst",
+                                                  "TYO",
+                                                  "Type-Moon",
+                                                  "U.S. Gold",
+                                                  "Ubisoft",
+                                                  "Ubisoft Annecy",
+                                                  "UEP Systems",
+                                                  "UFO Interactive",
+                                                  "UIG Entertainment",
+                                                  "Ultravision",
+                                                  "Universal Gamex",
+                                                  "Universal Interactive",
+                                                  "Unknown",
+                                                  "Valcon Games",
+                                                  "ValuSoft",
+                                                  "Valve",
+                                                  "Valve Software",
+                                                  "Vap",
+                                                  "Vatical Entertainment",
+                                                  "Vic Tokai",
+                                                  "Victor Interactive",
+                                                  "Video System",
+                                                  "Views",
+                                                  "Vir2L Studios",
+                                                  "Virgin Interactive",
+                                                  "Virtual Play Games",
+                                                  "Visco",
+                                                  "Vivendi Games",
+                                                  "Wanadoo",
+                                                  "Warashi",
+                                                  "Wargaming.net",
+                                                  "Warner Bros. Interactive Entertainment",
+                                                  "Warp",
+                                                  "WayForward Technologies",
+                                                  "Westwood Studios",
+                                                  "White Park Bay Software",
+                                                  "Wizard Video Games",
+                                                  "Xicat Interactive",
+                                                  "Xing Entertainment",
+                                                  "Xplosiv",
+                                                  "XS Games",
+                                                  "Xseed Games",
+                                                  "Yacht Club Games",
+                                                  "Yamasa Entertainment",
+                                                  "Yeti",
+                                                  "Yuke's",
+                                                  "Yumedia",
+                                                  "Zenrin",
+                                                  "Zoo Digital Publishing",
+                                                  "Zoo Games",
+                                                  "Zushi Games"
+                                                  ),
+                                        selected="All")
+                            
                         ),
-                        
                         mainPanel(
-                            box(width = 12, plotOutput("paretoChart", height = 800))
-                        )
-                    )
-            ),
-            tabItem("subitem2",
-                    "Sub-item 2 tab content",
-                    sidebarLayout(
-                        sidebarPanel(
-                        ),
-                        
-                        mainPanel(
-                            fileInput(
-                                "file1","Upload an xlsx file",accept = ".xlsx"
-                            ),
-                            p("After uploading your CSV file, click on the 'Inspect the Data' tab"),
-                            box(width = 12, plotOutput("plot1", height = 250))
+                            plotlyOutput("barchart1", width=1000,height=600)
                         )
                     )
             )
+
         )
     )
     
@@ -535,8 +1086,8 @@ server <- function(input, output){
         )
     })
     
-    #map
-    output$map1 <-renderPlotly({
+    #barchart
+    output$barchart1 <-renderPlotly({
         vg_grouped <- group_by(vg, `Publisher`)
         vg_summarised <- summarise(vg_grouped, 
                                    `Total NA_Sales` = sum(`NA_Sales`, na.rm = TRUE),
@@ -544,89 +1095,26 @@ server <- function(input, output){
                                    `Total JP_Sales` = sum(`JP_Sales`, na.rm = TRUE), 
                                    `Total Other_Sales` = sum(`Other_Sales`, na.rm = TRUE),
                                    `Total Global_Sales` = sum(`Global_Sales`, na.rm = TRUE))
-        vg_summarised <-vg_summarised[order(vg_summarised$`Total Global_Sales`,decreasing = TRUE),]
-        print(vg_summarised)
-        p <- plot_ly(vg_summarised, x = ~`Publisher`, y = ~`Total NA_Sales`, name = 'Total NA_Sales', type = 'bar')
-        p <- p %>% add_trace(y = ~`Total EU_Sales`, name = 'Total EU_Sales')
-        p <- p %>% add_trace(y = ~`Total JP_Sales`, name = 'Total JP_Sales')
-        p <- p %>% add_trace(y = ~`Total Other_Sales`, name = 'Total Other_Sales')
+        if (input$variable=='All'){
+            vg_summarised <-vg_summarised[order(vg_summarised$`Total Global_Sales`,decreasing = TRUE),]
+            vg_summarised$Publisher<-factor(vg_summarised$Publisher, levels = unique(vg_summarised$Publisher)[order(vg_summarised$`Total Global_Sales`, decreasing = TRUE)])
+        }else{
+            vg_summarised <- vg_summarised %>%
+                filter(`Publisher` ==input$variable)
+            vg_summarised <-vg_summarised[order(vg_summarised$`Total Global_Sales`,decreasing = TRUE),]
+            vg_summarised$Publisher<-factor(vg_summarised$Publisher, levels = unique(vg_summarised$Publisher)[order(vg_summarised$`Total Global_Sales`, decreasing = TRUE)])
+        }
+
+        p <- plot_ly(vg_summarised, x = ~`Publisher`, y = ~`Total NA_Sales`, name = 'Total NA_Sales', type = 'bar',text = ~`Total NA_Sales`, textposition = 'auto')
+        p <- p %>% add_trace(y = ~`Total EU_Sales`, name = 'Total EU_Sales',text = ~`Total EU_Sales`, textposition = 'auto')
+        p <- p %>% add_trace(y = ~`Total JP_Sales`, name = 'Total JP_Sales',text = ~`Total JP_Sales`, textposition = 'auto')
+        p <- p %>% add_trace(y = ~`Total Other_Sales`, name = 'Total Other_Sales',text = ~`Total Other_Sales`, textposition = 'auto')
+        
+        # style the xaxis
+        layout(p, xaxis = list(title = "Publisher"), yaxis=list(title = "Sales in million"),title = "Sale over the years")
         
     })
     
-    #pareto Chart
-    output$paretoChart <-renderPlot({
-        dat <-vg[order(vg$Global_Sales,decreasing = TRUE),]
-        myDf <-data.frame(sales = dat$Global_Sales,publisher= dat$Publisher, stringsAsFactors = FALSE)
-        
-        myDf<- myDf %>% as_tibble() %>% mutate(
-            cumulative = cumsum(sales),
-            freq = round(sales / sum(sales),3)*100,
-            cum_freq = cumsum(freq)
-        )
-        myDf[dim(myDf)[1],dim(myDf)[2]] <- 100 #force last level
-        
-        pareto <- ggplot(myDf, aes(x=reorder(publisher,-sales),y=sales)) +
-            geom_bar(aes(y=myDf$sales), fill='blue', stat="identity") +
-            geom_point(aes(y=myDf$cumulative), color = rgb(0, 1, 0), pch=16, size=3) +
-            geom_path(aes(y=myDf$cumulative, group=1)) +
-            theme(axis.text.x = element_text(size = 12,angle=90, vjust=0.6)) +
-            labs(title = "publisher Pareto Plot", 
-                 subtitle = "Produced by David Arteta", 
-                 x = 'Publishers', y = 'Cumulative Sales')
-        
-        pareto 
-    })
-    
-    the_data_fn <- reactive({
-        
-        dat <- datacsv
-        return(dat)
-    })# end of reading file
-    
-    #display a pareto plot
-    output$plot1 <- renderPlot({
-        dat <- the_data_fn()
-        dat <-dat[order(dat$N,decreasing = TRUE),]
-        myDf <-data.frame(count = dat$N,failure= dat$failure, stringsAsFactors = FALSE)
-        
-        
-        myDf<- myDf %>% as_tibble() %>% mutate(
-            cumulative = cumsum(count),
-            freq = round(count / sum(count),3)*100,
-            cum_freq = cumsum(freq)
-        )
-        myDf[dim(myDf)[1],dim(myDf)[2]] <- 100 #force last level
-        
-        pareto <- ggplot(myDf, aes(x=reorder(failure,-count),y=count)) +
-            geom_bar(aes(y=myDf$count), fill='blue', stat="identity") +
-            geom_point(aes(y=myDf$cumulative), color = rgb(0, 1, 0), pch=16, size=3) +
-            geom_path(aes(y=myDf$cumulative, group=1)) +
-            theme(axis.text.x = element_text(size = 12,angle=90, vjust=0.6)) +
-            labs(title = "Failure Pareto Plot", 
-                 subtitle = "Produced by David Arteta", 
-                 x = 'Failures', y = 'Cumulative Count')
-        
-        pareto + geom_label_repel(aes(label= myDf$cum_freq, y = myDf$cumulative),
-                                  box.padding = 0.35,
-                                  point.padding = 0.5,
-                                  segment.color = 'grey50')
-        
-    })# end of renderPlot
-    
-    # display a table with the cumulative values
-    output$summary <-renderPrint({
-        dat <- the_data_fn()
-        dat <-dat[order(dat$N,decreasing = TRUE),]
-        myDf <-data.frame(count = dat$N,failure= dat$failure, stringsAsFactors = FALSE)
-        
-        myDf<- myDf %>% as_tibble() %>% mutate(
-            cumsum = cumsum(count),
-            freq = round(count / sum(count),3)*100,
-            cum_freq = cumsum(freq)
-        )
-        myDf[dim(myDf)[1],dim(myDf)[2]] <- 100 #force last level
-        return(myDf)
-    })# end of renderPrint
 }
 
 shinyApp(ui=ui,server=server)
