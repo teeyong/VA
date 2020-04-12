@@ -1,0 +1,12 @@
+name: project
+title: project
+username:
+account: teeyong
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2099192
+bundleId: 3003286
+url: https://teeyong.shinyapps.io/project/
+when: 1586703533.52128
+asMultiple: FALSE
+asStatic: FALSE

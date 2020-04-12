@@ -1,35 +1,34 @@
-#packages = c('tidyverse','shiny','shinydashboard','plotly','ggplot2','ggrepel','treemap')
+#packages = c('readr','shiny','shinydashboard','plotly','ggplot2','ggrepel','treemap')
 #for (p in packages){
    # if (!require(p, character.only= T)){
-  #      install.packages(p)
-    #}
- #   library(p,character.only= T)
+    #    install.packages(p)
+   # }
+   # library(p,character.only= T)
 #}
-
-library(shiny)
-library(shinydashboard, warn.conflicts=FALSE)
-library(tidyverse, warn.conflicts=FALSE)
-library(plotly, warn.conflicts=FALSE)
-library(ggplot2, warn.conflicts=FALSE)
-library(ggrepel, warn.conflicts=FALSE)
-library(treemap, warn.conflicts=FALSE)
+library('readr')
+library('shiny')
+library('shinydashboard')
+library('plotly')
+library('treemap')
+library('ggrepel')
+library('ggplot2')
 
 
 vg<-read_csv("data/vgsales.csv")
 
 #interface with interactivity
 if (interactive()) {
-    header <- dashboardHeader(title=img(src = "nogamenolife.png",height='40',width='100'))
+    head <- dashboardHeader(title=img(src = "nogamenolife.png",height='40',width='100'))
     
-    sidebar <- dashboardSidebar(
+    side <- dashboardSidebar(
         sidebarMenu(
             # Setting id makes input$tabs give the tabName of currently-selected tab
             id = "tabs",
             menuItem("About Us", tabName = "aboutus", icon = icon("info")),
             menuItem("Overview", tabName = "overview", icon = icon("dashboard")),
-            menuItem("Details", icon = icon("dashboard"),
-                     menuSubItem("Sub-item 1", tabName = "heatmap1",  icon = icon("dashboard")),
-                     menuSubItem("Sub-item 2", tabName = "heatmap2",  icon = icon("dashboard"))
+            menuItem("Genre", icon = icon("dashboard"),
+                     menuSubItem("By Region", tabName = "heatmap1",  icon = icon("dashboard")),
+                     menuSubItem("Global", tabName = "heatmap2",  icon = icon("dashboard"))
             ),
             menuItem("Publisher", tabName = "Graph", icon = icon("dashboard"))
         ),collapsed = FALSE
@@ -43,9 +42,9 @@ if (interactive()) {
                     tags$h4("With an increasingly saturated market and disruption caused by mobile and VR games, we aim to create an interactive platform to understand game sales trends in order to validate console sales trends and to identify the best performing games, regions and genres across the different consoles."),
                     tags$h1("Our Objective"),
                     h4(tags$ol(
-                        tags$li("Identify game sales trends within each console since 1980. We will also identify the top performing modern console (PS4, XBOX1, PC or Wii U)"),
-                        tags$li("Find relationships between consoles and genres, regions and publishers"),
-                        tags$li("If possible, extrapolate current games sales trends into the future for each console"))
+                        tags$li("Identify games sales trends within each console since 1980 with a focus on modern consoles to extrapolate useful insights for today."),
+                        tags$li("Find relationships between consoles and genres across regions and publishers. Gain related consumer insights."),
+                        tags$li("Extrapolate current gaming sales trends for future trends for each console for an overall visualization on the outlook of the video gaming industry."))
                        ),
             ),
             tabItem("overview",
@@ -683,7 +682,7 @@ if (interactive()) {
 
 
 
-ui <- dashboardPage(skin = "black",header, sidebar, body)
+ui <- dashboardPage(skin = "black",header=head, sidebar=side, body=body)
 
 server <- function(input, output){
 
